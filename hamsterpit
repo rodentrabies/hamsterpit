@@ -1,0 +1,48 @@
+#! /usr/bin/env bash
+
+EXECUTABLE="$0"
+
+hamsterpit_usage () {
+    cat <<EOF
+Usage: $EXECUTABLE [COMMAND]
+
+Run your coding agent of choice inside a container where it can only access the 
+given project directory. The review and source control operations are assumed to
+happen outside of the container.
+
+Commands:
+          build          - build an image containing the agents and dependencies
+          run [PROJECT]  - run the container and give it access to the PROJECT
+                           directory
+          help           - show this message
+
+EOF
+}
+
+hamsterpit_build () {
+    podman build -t hamsterpit .
+}
+
+hamsterpit_run () {
+    local project_path="$1"
+    local container_id="$(echo -n "$project_path" | sha256sum | cut -c1-8)"
+    podman run -it --rm \
+           -v "$project_path":/workspace \
+           -v "$(pwd)/.gemini":/root/.gemini \
+           -v "$(pwd)/.claude":/root/.claude \
+           --name "hamsterpit-$container_id" \
+           hamsterpit
+}
+
+case "$1" in
+    build)
+        hamsterpit_build
+        ;;
+    run)
+        hamsterpit_run "$2"
+        ;;
+    *)
+        hamsterpit_usage
+        exit 1
+        ;;
+esac
