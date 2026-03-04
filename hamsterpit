@@ -31,6 +31,8 @@ hamsterpit_build () {
 hamsterpit_run () {
     # Build the image if it does not exist.
     $CMANAGER images -q $IMAGENAME | grep -q . || hamsterpit_build
+    # Ensure state/config directories exist.
+    mkdir -p .claude .gemini
     # Run the container.
     local project_path="$1"
     local container_id="$(echo -n "$project_path" | sha256sum | cut -c1-8)"
