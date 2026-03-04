@@ -2,6 +2,8 @@
 
 EXECUTABLE="$0"
 
+CMANAGER=docker
+
 hamsterpit_usage () {
     cat <<EOF
 Usage: $EXECUTABLE [COMMAND]
@@ -20,13 +22,13 @@ EOF
 }
 
 hamsterpit_build () {
-    podman build --no-cache -t hamsterpit .
+    $CMANAGER build --no-cache -t hamsterpit .
 }
 
 hamsterpit_run () {
     local project_path="$1"
     local container_id="$(echo -n "$project_path" | sha256sum | cut -c1-8)"
-    podman run -it --rm \
+    $CMANAGER run -it --rm \
            -v "$project_path":/workspace \
            -v "$(pwd)/.gemini":/root/.gemini \
            -v "$(pwd)/.claude":/root/.claude \
