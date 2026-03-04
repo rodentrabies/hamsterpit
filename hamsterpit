@@ -20,7 +20,7 @@ EOF
 }
 
 hamsterpit_build () {
-    podman build -t hamsterpit .
+    podman build --no-cache -t hamsterpit .
 }
 
 hamsterpit_run () {
