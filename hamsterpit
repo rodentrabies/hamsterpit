@@ -1,27 +1,37 @@
 #! /usr/bin/env bash
 
-EXECUTABLE="$0"
+SCRIPTNAME="$0"
 
 # Save the location of the of the script - it is where the Dockerfile
 # resides.
 SCRIPTDIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 CMANAGER=docker
+
 IMAGENAME=hamsterpit
 
 hamsterpit_usage () {
     cat <<EOF
-Usage: $EXECUTABLE [COMMAND]
+Usage: $SCRIPTNAME [COMMAND]
 
-Run your coding agent of choice inside a container where it can only access the 
+Run your coding agent of choice inside a container where it can only access the
 given project directory. The review and source control operations are assumed to
 happen outside of the container.
 
 Commands:
-          build          - build an image containing the agents and dependencies
-          run [PROJECT]  - run the container and give it access to the PROJECT
-                           directory
-          help           - show this message
+
+    run [PROJECT]+  - run the container and give it access to one or more
+                      project directories; automatically builds the image
+                      containing the agents and dependencies, if it does not
+                      exist
+
+    build           - build an image containing the agents and dependencies
+
+    help            - show this message
+
+Examples:
+
+    $SCRIPTNAME run /path/to/project1 /path/to/project2
 
 EOF
 }
@@ -37,11 +47,18 @@ hamsterpit_run () {
     $CMANAGER images -q $IMAGENAME | grep -q . || hamsterpit_build
     # Ensure state/config directories exist.
     mkdir -p .claude .gemini
-    # Run the container.
-    local project_path="$1"
-    local container_id="$(echo -n "$project_path" | sha256sum | cut -c1-8)"
+    # Build volume mounts and container name from all provided paths.
+    local volumes=""
+    for host_path in "$@"; do
+        local container_path="$(basename "$host_path")"
+        volumes="$volumes -v $host_path:/workspace/$container_path"
+    done
+    # Make a distinct container ID.
+    local container_id="$(echo -n "$@" | sha256sum | cut -c1-8)"
+    # Start the container with all project directories mounted into
+    # `/workdir`.
     $CMANAGER run -it --rm \
-           -v "$project_path":/workspace \
+           $volumes \
            -v "$(pwd)/.gemini":/root/.gemini \
            -v "$(pwd)/.claude":/root/.claude \
            --name "hamsterpit-$container_id" \
@@ -53,7 +70,11 @@ case "$1" in
         hamsterpit_build
         ;;
     run)
-        hamsterpit_run "$2"
+        shift
+        hamsterpit_run "$@"
+        ;;
+    help)
+        hamsterpit_help
         ;;
     *)
         hamsterpit_usage
