@@ -5,7 +5,7 @@ your project, delimited by a filesystem subtree.
 
 To run, give it the path to subtree you want the agent to see:
 
-    $ hamstepit run /path/to/your/project/subdirectory
+    $ hamsterpit run /path/to/your/project/subdirectory
 
 and then inside the container, start the agent:
 
