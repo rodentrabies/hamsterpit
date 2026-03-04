@@ -23,9 +23,12 @@ EOF
 }
 
 hamsterpit_build () {
+    # Save the location of the of the script - it is where the Dockerfile
+    # resides.
+    local scriptdir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
     # Use `--no-cache` to make sure we always get the most recent
     # packages if rebuilding explicitly.
-    $CMANAGER build --no-cache -t $IMAGENAME .
+    $CMANAGER build --no-cache -t $IMAGENAME $scriptdir
 }
 
 hamsterpit_run () {
