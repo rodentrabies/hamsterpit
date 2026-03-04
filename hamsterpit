@@ -2,6 +2,10 @@
 
 EXECUTABLE="$0"
 
+# Save the location of the of the script - it is where the Dockerfile
+# resides.
+SCRIPTDIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
 CMANAGER=docker
 IMAGENAME=hamsterpit
 
@@ -23,12 +27,9 @@ EOF
 }
 
 hamsterpit_build () {
-    # Save the location of the of the script - it is where the Dockerfile
-    # resides.
-    local scriptdir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
     # Use `--no-cache` to make sure we always get the most recent
     # packages if rebuilding explicitly.
-    $CMANAGER build --no-cache -t $IMAGENAME $scriptdir
+    $CMANAGER build --no-cache -t $IMAGENAME $SCRIPTDIR
 }
 
 hamsterpit_run () {
