@@ -17,3 +17,12 @@ and start working.
 The tool works via mapped directories. The given subtree is mapped to
 the `/workspace` inside the container and the agent does not see
 anything outside of that.
+
+The agent config/state directories are expected to exist in the
+location from which you invoke the tool, so make sure to do
+
+    $ mkdir .claude
+    $ mkdir .gemini
+
+before running `hamsterpit`. Also note that the path you provide to
+the `run` command should be absolute.
