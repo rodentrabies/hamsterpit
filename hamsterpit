@@ -3,6 +3,7 @@
 EXECUTABLE="$0"
 
 CMANAGER=docker
+IMAGENAME=hamsterpit
 
 hamsterpit_usage () {
     cat <<EOF
@@ -22,11 +23,15 @@ EOF
 }
 
 hamsterpit_build () {
-    $CMANAGER build --no-cache -t hamsterpit .
+    # Use `--no-cache` to make sure we always get the most recent
+    # packages if rebuilding explicitly.
+    $CMANAGER build --no-cache -t $IMAGENAME .
 }
 
 hamsterpit_run () {
-    $CMANAGER images -q hamsterpit | grep -q . || hamsterpit_build
+    # Build the image if it does not exist.
+    $CMANAGER images -q $IMAGENAME | grep -q . || hamsterpit_build
+    # Run the container.
     local project_path="$1"
     local container_id="$(echo -n "$project_path" | sha256sum | cut -c1-8)"
     $CMANAGER run -it --rm \
@@ -34,7 +39,7 @@ hamsterpit_run () {
            -v "$(pwd)/.gemini":/root/.gemini \
            -v "$(pwd)/.claude":/root/.claude \
            --name "hamsterpit-$container_id" \
-           hamsterpit
+           $IMAGENAME
 }
 
 case "$1" in
