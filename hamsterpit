@@ -49,7 +49,8 @@ hamsterpit_run () {
     mkdir -p .claude .gemini
     # Build volume mounts and container name from all provided paths.
     local volumes=""
-    for host_path in "$@"; do
+    for path in "$@"; do
+        host_path="$(realpath "$path")"
         local container_path="$(basename "$host_path")"
         volumes="$volumes -v $host_path:/workspace/$container_path"
     done
