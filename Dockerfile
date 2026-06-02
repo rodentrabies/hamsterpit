@@ -7,19 +7,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     less \
     && rm -rf /var/lib/apt/lists/*
 
-RUN useradd \
-    --create-home \
-    --uid 1000 \
-    --shell /bin/bash claude \
-    && mkdir -p /workspace \
-    && chown claude:claude /workspace
-
-USER claude
-
-ENV HOME=/home/claude
-ENV PATH="/home/claude/.local/bin:${PATH}"
-
 RUN curl -fsSL https://claude.ai/install.sh | bash
+
+ENV PATH="/root/.local/bin:${PATH}"
 
 ENV DISABLE_AUTOUPDATER=1
 
