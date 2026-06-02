@@ -1,24 +1,28 @@
-FROM node:20-slim
+FROM debian:bookworm-slim
 
-# Install basic development tools.
-RUN apt-get update && apt-get install -y \
+RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
     curl \
-    python3 \
-    make \
-    g++ \
+    ca-certificates \
+    less \
     && rm -rf /var/lib/apt/lists/*
 
-# Enable pnpm via Corepack.
-ENV PNPM_HOME="/pnpm"
-ENV PATH="$PNPM_HOME:$PATH"
-RUN corepack enable
+RUN useradd \
+    --create-home \
+    --uid 1000 \
+    --shell /bin/bash claude \
+    && mkdir -p /workspace \
+    && chown claude:claude /workspace
 
-# Install Gemini CLI and Claude Code.
-RUN pnpm add -g @google/gemini-cli @anthropic-ai/claude-code
+USER claude
 
-# Set the working directory.
+ENV HOME=/home/claude
+ENV PATH="/home/claude/.local/bin:${PATH}"
+
+RUN curl -fsSL https://claude.ai/install.sh | bash
+
+ENV DISABLE_AUTOUPDATER=1
+
 WORKDIR /workspace
 
-# Start with bash and choose the agent interactively.
-CMD ["/bin/bash"]
+CMD ["claude"]
