@@ -5,6 +5,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     ca-certificates \
     less \
+    python3 \
+    python3-pip \
+    python3-venv \
+    python-is-python3 \
     && rm -rf /var/lib/apt/lists/*
 
 RUN curl -fsSL https://claude.ai/install.sh | bash

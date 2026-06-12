@@ -24,6 +24,5 @@ anything outside of that. In the example above, the directory
 `path/to/project1` will be located at `/workspace/project1` inside
 the container, and `path/to/project2` - at `/workspace/project2`.
 
-The agent config/state directories (`.claude`, `.gemini`) will be
-automatically created at the location from which the `hamsterpit run`
-is executed.
+The agent config/state directories (`.claude`) will be automatically
+created at the location from which the `hamsterpit run` is executed.
